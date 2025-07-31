@@ -1,0 +1,31 @@
+package com.project.restaurant_review.service.impl;
+
+import com.project.restaurant_review.entity.Address;
+import com.project.restaurant_review.entity.GeoLocation;
+import com.project.restaurant_review.service.GeoLocationService;
+
+import java.util.Random;
+
+public class RandomLondonGeoLocationService implements GeoLocationService {
+
+    private static final float MIN_LATITUDE = 51.28f;
+
+    private static final float MAX_LATITUDE = 51.686f;
+
+    private static final float MIN_LONGITUDE = -0.489f;
+
+    private static final float MAX_LONGITUDE = 0.236f;
+
+    @Override
+    public GeoLocation geoLocate(Address address) {
+        Random random = new Random();
+        var latitude = MIN_LATITUDE + random.nextDouble() * (MAX_LATITUDE - MIN_LATITUDE);
+        var longitude = MIN_LONGITUDE + random.nextDouble() * (MAX_LONGITUDE - MIN_LONGITUDE);
+
+        return GeoLocation.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
+    }
+
+}

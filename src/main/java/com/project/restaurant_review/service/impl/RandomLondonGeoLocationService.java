@@ -3,9 +3,10 @@ package com.project.restaurant_review.service.impl;
 import com.project.restaurant_review.entity.Address;
 import com.project.restaurant_review.entity.GeoLocation;
 import com.project.restaurant_review.service.GeoLocationService;
+import org.springframework.stereotype.Service;
 
 import java.util.Random;
-
+@Service
 public class RandomLondonGeoLocationService implements GeoLocationService {
 
     private static final float MIN_LATITUDE = 51.28f;

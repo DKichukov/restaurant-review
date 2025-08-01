@@ -10,6 +10,6 @@ public interface PhotoService {
 
     PhotoDto uploadPhoto(MultipartFile file);
 
-    Optional<Resource> getPhotoAsResource(String fileName);
+    Optional<Resource> getPhotoAsResource(String id);
 
 }

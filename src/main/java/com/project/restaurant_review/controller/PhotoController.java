@@ -29,9 +29,9 @@ public class PhotoController {
         return photoService.uploadPhoto(file);
     }
 
-    @GetMapping(path = "/{fileName:.+}")
-    public ResponseEntity<Resource> getPhoto(@PathVariable String fileName) {
-        return photoService.getPhotoAsResource(fileName).map(photo ->
+    @GetMapping(path = "/{id:.+}")
+    public ResponseEntity<Resource> getPhoto(@PathVariable String id) {
+        return photoService.getPhotoAsResource(id).map(photo ->
                         ResponseEntity.ok()
                                 .contentType(getMediaType(photo)
                                         .orElse(MediaType.APPLICATION_OCTET_STREAM))

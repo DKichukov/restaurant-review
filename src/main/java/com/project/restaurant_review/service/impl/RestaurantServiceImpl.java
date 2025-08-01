@@ -1,10 +1,13 @@
 package com.project.restaurant_review.service.impl;
 
-import com.project.restaurant_review.entity.RestaurantCreateUpdateRequest;
+import com.project.restaurant_review.dto.RestaurantCreateUpdateRequestDto;
+import com.project.restaurant_review.dto.RestaurantDto;
 import com.project.restaurant_review.entity.Address;
 import com.project.restaurant_review.entity.GeoLocation;
 import com.project.restaurant_review.entity.Photo;
 import com.project.restaurant_review.entity.Restaurant;
+import com.project.restaurant_review.entity.RestaurantCreateUpdateRequest;
+import com.project.restaurant_review.mapper.RestaurantMapper;
 import com.project.restaurant_review.repository.RestaurantRepository;
 import com.project.restaurant_review.service.GeoLocationService;
 import com.project.restaurant_review.service.RestaurantService;
@@ -20,10 +23,14 @@ import java.util.List;
 public class RestaurantServiceImpl implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+
     private final GeoLocationService geoLocationService;
 
+    private final RestaurantMapper restaurantMapper;
+
     @Override
-    public Restaurant createRestaurant(RestaurantCreateUpdateRequest request) {
+    public RestaurantDto createRestaurant(RestaurantCreateUpdateRequestDto requestDto) {
+        RestaurantCreateUpdateRequest request = restaurantMapper.toRestaurantCreateUpdateRequest(requestDto);
         Address address = request.getAddress();
         var uploadedDate = LocalDateTime.now();
         GeoLocation geoLocation = geoLocationService.geoLocate(address);
@@ -46,7 +53,8 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .photos(photos)
                 .build();
 
-        return restaurantRepository.save(restaurant);
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        return restaurantMapper.toRestaurantDto(savedRestaurant);
     }
 
 }

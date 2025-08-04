@@ -8,6 +8,7 @@ import com.project.restaurant_review.entity.GeoLocation;
 import com.project.restaurant_review.entity.Photo;
 import com.project.restaurant_review.entity.Restaurant;
 import com.project.restaurant_review.entity.RestaurantCreateUpdateRequest;
+import com.project.restaurant_review.exception.RestaurantNotFoundException;
 import com.project.restaurant_review.mapper.RestaurantMapper;
 import com.project.restaurant_review.repository.RestaurantRepository;
 import com.project.restaurant_review.service.GeoLocationService;
@@ -26,6 +27,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RestaurantServiceImpl implements RestaurantService {
 
+    private final LocalDateTime uploadedDate = LocalDateTime.now();
+
     private final RestaurantRepository restaurantRepository;
 
     private final GeoLocationService geoLocationService;
@@ -36,7 +39,6 @@ public class RestaurantServiceImpl implements RestaurantService {
     public RestaurantDto createRestaurant(RestaurantCreateUpdateRequestDto requestDto) {
         RestaurantCreateUpdateRequest request = restaurantMapper.toRestaurantCreateUpdateRequest(requestDto);
         Address address = request.getAddress();
-        var uploadedDate = LocalDateTime.now();
         GeoLocation geoLocation = geoLocationService.geoLocate(address);
         GeoPoint geoPoint = new GeoPoint(geoLocation.getLatitude(), geoLocation.getLongitude());
 
@@ -93,9 +95,40 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Optional<RestaurantDto> getRestaurant(String id) {
+    public Optional<RestaurantDto> getRestaurantDto(String id) {
         return restaurantRepository.findById(id)
                 .map(restaurantMapper::toRestaurantDto);
+    }
+
+    @Override
+    public RestaurantDto updateRestaurant(String id,
+                                          RestaurantCreateUpdateRequestDto restaurantCreateUpdateRequestDto) {
+
+        var restaurantCreateUpdateRequest = restaurantMapper.
+                toRestaurantCreateUpdateRequest(restaurantCreateUpdateRequestDto);
+        Restaurant restaurant = restaurantRepository.findById(id).orElseThrow(
+                () -> new RestaurantNotFoundException("Restaurant with ID does not exist" + id));
+
+        GeoLocation geoLocation = geoLocationService.geoLocate(restaurantCreateUpdateRequest.getAddress());
+        GeoPoint geoPoint = new GeoPoint(geoLocation.getLatitude(), geoLocation.getLongitude());
+
+        List<String> photoIds = restaurantCreateUpdateRequest.getPhotoIds();
+        List<Photo> photos = photoIds.stream().map(photoUrl -> Photo.builder()
+                .url(photoUrl)
+                .uploadDate(uploadedDate)
+                .build()).toList();
+
+        restaurant.setName(restaurantCreateUpdateRequest.getName());
+        restaurant.setCuisineType(restaurantCreateUpdateRequest.getCuisine());
+        restaurant.setContactInformation(restaurantCreateUpdateRequest.getContactInformation());
+        restaurant.setAddress(restaurantCreateUpdateRequest.getAddress());
+        restaurant.setGeoLocation(geoPoint);
+        restaurant.setOperatingHours(restaurantCreateUpdateRequest.getOperatingHours());
+        restaurant.setPhotos(photos);
+
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+
+        return restaurantMapper.toRestaurantDto(savedRestaurant);
     }
 
 

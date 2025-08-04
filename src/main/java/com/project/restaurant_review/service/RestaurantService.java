@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface RestaurantService {
 
     RestaurantDto createRestaurant(RestaurantCreateUpdateRequestDto request);
+
     Page<RestaurantSummaryDto> searchRestaurants(String query,
                                                  Float minRating,
                                                  Float latitude,
@@ -18,6 +19,10 @@ public interface RestaurantService {
                                                  Float radius,
                                                  Pageable pageable);
 
-    Optional<RestaurantDto> getRestaurant(String id);
+    Optional<RestaurantDto> getRestaurantDto(String id);
+
+    RestaurantDto updateRestaurant(String id,
+                                   RestaurantCreateUpdateRequestDto restaurantCreateUpdateRequestDto);
+
 }
 

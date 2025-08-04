@@ -2,6 +2,7 @@ package com.project.restaurant_review.service.impl;
 
 import com.project.restaurant_review.dto.RestaurantCreateUpdateRequestDto;
 import com.project.restaurant_review.dto.RestaurantDto;
+import com.project.restaurant_review.dto.RestaurantSummaryDto;
 import com.project.restaurant_review.entity.Address;
 import com.project.restaurant_review.entity.GeoLocation;
 import com.project.restaurant_review.entity.Photo;
@@ -60,34 +61,34 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Page<RestaurantDto> searchRestaurants(String query,
-                                                 Float minRating,
-                                                 Float latitude,
-                                                 Float longitude,
-                                                 Float radius,
-                                                 Pageable pageable) {
+    public Page<RestaurantSummaryDto> searchRestaurants(String query,
+                                                        Float minRating,
+                                                        Float latitude,
+                                                        Float longitude,
+                                                        Float radius,
+                                                        Pageable pageable) {
         if (minRating != null && (query == null || query.isEmpty())) {
 
             Page<Restaurant> restaurantPage = restaurantRepository.findByAverageRatingGreaterThanEqual(minRating, pageable);
-            return restaurantPage.map(restaurantMapper::toRestaurantDto);
+            return restaurantPage.map(restaurantMapper::toSummaryDto);
         }
         Float searchMinRating = minRating == null ? 0f : minRating;
 
         if (query != null && !query.trim().isEmpty()) {
             Page<Restaurant> minRatingRestaurantPage = restaurantRepository.findByQueryAndMinRating(query, searchMinRating,
                     pageable);
-            return minRatingRestaurantPage.map(restaurantMapper::toRestaurantDto);
+            return minRatingRestaurantPage.map(restaurantMapper::toSummaryDto);
         }
 
         if (latitude != null && longitude != null && radius != null) {
             Page<Restaurant> byLocationNearPage = restaurantRepository.findByLocationNear(latitude, longitude, radius,
                     pageable);
-            return byLocationNearPage.map(restaurantMapper::toRestaurantDto);
+            return byLocationNearPage.map(restaurantMapper::toSummaryDto);
         }
 
         Page<Restaurant> foundRestaurants = restaurantRepository.findAll(pageable);
 
-        return foundRestaurants.map(restaurantMapper::toRestaurantDto);
+        return foundRestaurants.map(restaurantMapper::toSummaryDto);
     }
 
 

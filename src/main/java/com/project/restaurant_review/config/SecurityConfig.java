@@ -19,6 +19,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/photos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/restaurants/**").permitAll()
                         //for testing only
                         .requestMatchers(HttpMethod.POST, "/api/restaurants/**").permitAll()
                         .anyRequest().authenticated())

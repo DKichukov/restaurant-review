@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -89,6 +90,12 @@ public class RestaurantServiceImpl implements RestaurantService {
         Page<Restaurant> foundRestaurants = restaurantRepository.findAll(pageable);
 
         return foundRestaurants.map(restaurantMapper::toSummaryDto);
+    }
+
+    @Override
+    public Optional<RestaurantDto> getRestaurant(String id) {
+        return restaurantRepository.findById(id)
+                .map(restaurantMapper::toRestaurantDto);
     }
 
 

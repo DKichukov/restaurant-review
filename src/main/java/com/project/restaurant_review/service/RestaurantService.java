@@ -6,6 +6,8 @@ import com.project.restaurant_review.dto.RestaurantSummaryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 public interface RestaurantService {
 
     RestaurantDto createRestaurant(RestaurantCreateUpdateRequestDto request);
@@ -16,4 +18,6 @@ public interface RestaurantService {
                                                  Float radius,
                                                  Pageable pageable);
 
+    Optional<RestaurantDto> getRestaurant(String id);
 }
+

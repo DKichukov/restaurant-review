@@ -12,6 +12,8 @@ import com.project.restaurant_review.repository.RestaurantRepository;
 import com.project.restaurant_review.service.GeoLocationService;
 import com.project.restaurant_review.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 
@@ -56,5 +58,37 @@ public class RestaurantServiceImpl implements RestaurantService {
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
         return restaurantMapper.toRestaurantDto(savedRestaurant);
     }
+
+    @Override
+    public Page<RestaurantDto> searchRestaurants(String query,
+                                                 Float minRating,
+                                                 Float latitude,
+                                                 Float longitude,
+                                                 Float radius,
+                                                 Pageable pageable) {
+        if (minRating != null && (query == null || query.isEmpty())) {
+
+            Page<Restaurant> restaurantPage = restaurantRepository.findByAverageRatingGreaterThanEqual(minRating, pageable);
+            return restaurantPage.map(restaurantMapper::toRestaurantDto);
+        }
+        Float searchMinRating = minRating == null ? 0f : minRating;
+
+        if (query != null && !query.trim().isEmpty()) {
+            Page<Restaurant> minRatingRestaurantPage = restaurantRepository.findByQueryAndMinRating(query, searchMinRating,
+                    pageable);
+            return minRatingRestaurantPage.map(restaurantMapper::toRestaurantDto);
+        }
+
+        if (latitude != null && longitude != null && radius != null) {
+            Page<Restaurant> byLocationNearPage = restaurantRepository.findByLocationNear(latitude, longitude, radius,
+                    pageable);
+            return byLocationNearPage.map(restaurantMapper::toRestaurantDto);
+        }
+
+        Page<Restaurant> foundRestaurants = restaurantRepository.findAll(pageable);
+
+        return foundRestaurants.map(restaurantMapper::toRestaurantDto);
+    }
+
 
 }

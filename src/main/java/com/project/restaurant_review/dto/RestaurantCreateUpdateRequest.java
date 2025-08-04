@@ -1,5 +1,7 @@
-package com.project.restaurant_review.entity;
+package com.project.restaurant_review.dto;
 
+import com.project.restaurant_review.entity.Address;
+import com.project.restaurant_review.entity.OperatingHours;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

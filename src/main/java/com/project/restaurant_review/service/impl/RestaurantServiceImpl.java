@@ -7,7 +7,7 @@ import com.project.restaurant_review.entity.Address;
 import com.project.restaurant_review.entity.GeoLocation;
 import com.project.restaurant_review.entity.Photo;
 import com.project.restaurant_review.entity.Restaurant;
-import com.project.restaurant_review.entity.RestaurantCreateUpdateRequest;
+import com.project.restaurant_review.dto.RestaurantCreateUpdateRequest;
 import com.project.restaurant_review.exception.RestaurantNotFoundException;
 import com.project.restaurant_review.mapper.RestaurantMapper;
 import com.project.restaurant_review.repository.RestaurantRepository;

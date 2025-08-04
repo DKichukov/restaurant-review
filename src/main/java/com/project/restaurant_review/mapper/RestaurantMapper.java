@@ -5,7 +5,7 @@ import com.project.restaurant_review.dto.RestaurantCreateUpdateRequestDto;
 import com.project.restaurant_review.dto.RestaurantDto;
 import com.project.restaurant_review.dto.RestaurantSummaryDto;
 import com.project.restaurant_review.entity.Restaurant;
-import com.project.restaurant_review.entity.RestaurantCreateUpdateRequest;
+import com.project.restaurant_review.dto.RestaurantCreateUpdateRequest;
 import com.project.restaurant_review.entity.Review;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,4 +65,12 @@ public class RestaurantController {
 
         return ResponseEntity.ok(updatedRestaurantDto);
     }
+
+    @DeleteMapping(path = "/{restaurantId}")
+    public ResponseEntity<Void> deleteRestaurant(@PathVariable("restaurantId") String restaurantId) {
+        restaurantService.deleteRestaurant(restaurantId);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

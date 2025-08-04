@@ -131,5 +131,10 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantMapper.toRestaurantDto(savedRestaurant);
     }
 
+    @Override
+    public void deleteRestaurant(String id) {
+        restaurantRepository.deleteById(id);
+    }
+
 
 }

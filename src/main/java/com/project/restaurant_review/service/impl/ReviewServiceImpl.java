@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -126,11 +127,59 @@ public class ReviewServiceImpl implements ReviewService {
                                          String reviewId) {
         Restaurant restaurant = getRestaurantOrThrow(restaurantId);
 
+        return getReviewDtoFromRestaurant(reviewId, restaurant);
+
+    }
+
+    private Optional<ReviewDto> getReviewDtoFromRestaurant(String reviewId,
+                                                           Restaurant restaurant) {
         return restaurant.getReviews().stream()
                 .filter(r -> reviewId.equals(r.getId()))
                 .findFirst()
                 .map(reviewMapper::toReviewDto);
+    }
 
+    @Override
+    public ReviewDto updateReview(User author,
+                                  String restaurantId,
+                                  String reviewId,
+                                  ReviewCreateUpdateRequestDto reviewRequest) {
+        Restaurant restaurant = getRestaurantOrThrow(restaurantId);
+        String authorId = author.getId();
+        ReviewDto reviewDtoFromRestaurant = getReviewDtoFromRestaurant(reviewId, restaurant)
+                .orElseThrow(() -> new ReviewNotAllowedException("Review does not exist"));
+        var existingReview = reviewMapper.toReview(reviewDtoFromRestaurant);
+
+        if (!existingReview.getWrittenBy().getId().equals(authorId)) {
+            throw new ReviewNotAllowedException("Cannot update another user's review");
+        }
+        if (now.isAfter(existingReview.getDatePosted().plusHours(48))) {
+            throw new ReviewNotAllowedException("Review can no longer be edited");
+        }
+
+        existingReview.setContent(reviewRequest.getContent());
+        existingReview.setRating(reviewRequest.getRating());
+        existingReview.setLastEdited(now);
+        existingReview.setPhotos(reviewRequest.getPhotoIds().stream()
+                .map(photoId -> Photo
+                        .builder()
+                        .url(photoId)
+                        .uploadDate(now)
+                        .build()).toList());
+
+        List<Review> updatedReviews = restaurant.getReviews().stream()
+                .filter(r -> !reviewId.equals(r.getId()))
+                .collect(Collectors.toList());
+
+        updatedReviews.add(existingReview);
+
+        updateRestaurantAverageRating(restaurant);
+
+        restaurant.setReviews(updatedReviews);
+
+        restaurantRepository.save(restaurant);
+
+        return reviewMapper.toReviewDto(existingReview);
     }
 
     private Restaurant getRestaurantOrThrow(String restaurantId) {

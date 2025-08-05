@@ -14,4 +14,6 @@ public interface ReviewMapper {
 
     ReviewDto toReviewDto(Review review);
 
+    Review toReview(ReviewDto reviewDto);
+
 }

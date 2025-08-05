@@ -10,11 +10,22 @@ import java.util.Optional;
 
 public interface ReviewService {
 
-    ReviewDto createReview(User author, String restaurantId,
+    ReviewDto createReview(User author,
+                           String restaurantId,
                            ReviewCreateUpdateRequestDto reviewRequest);
-    Page<ReviewDto> lastReviews(String restaurantId, Pageable pageable);
-    Optional<ReviewDto> getReview(String restaurantId, String reviewId);
-    ReviewDto updateReview(User author,String restaurantId, String reviewId,
+
+    Page<ReviewDto> lastReviews(String restaurantId,
+                                Pageable pageable);
+
+    Optional<ReviewDto> getReview(String restaurantId,
+                                  String reviewId);
+
+    ReviewDto updateReview(User author,
+                           String restaurantId,
+                           String reviewId,
                            ReviewCreateUpdateRequestDto reviewRequest);
+
+    void deleteReview(String restaurantId,
+                      String reviewId);
 
 }

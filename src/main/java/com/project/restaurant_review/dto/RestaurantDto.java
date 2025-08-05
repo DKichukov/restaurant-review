@@ -1,6 +1,5 @@
 package com.project.restaurant_review.dto;
 
-import com.project.restaurant_review.entity.Review;
 import com.project.restaurant_review.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +33,7 @@ public class RestaurantDto {
 
     private List<PhotoDto> photos = new ArrayList<>();
 
-    private List<Review> reviews = new ArrayList<>();
+    private List<ReviewDto> reviews = new ArrayList<>();
 
     private User createdBy;
 

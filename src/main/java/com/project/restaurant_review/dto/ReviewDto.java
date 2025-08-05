@@ -1,7 +1,5 @@
 package com.project.restaurant_review.dto;
 
-import com.project.restaurant_review.entity.Photo;
-import com.project.restaurant_review.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +25,7 @@ public class ReviewDto {
 
     private LocalDateTime lastEdited;
 
-    private List<PhotoDto   > photos = new ArrayList<>();
+    private List<PhotoDto> photos = new ArrayList<>();
 
     private UserDto writtenBy;
 

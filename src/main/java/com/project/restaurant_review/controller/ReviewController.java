@@ -6,31 +6,47 @@ import com.project.restaurant_review.entity.User;
 import com.project.restaurant_review.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 @RestController
 @RequestMapping("/api/restaurants/{restaurantId}/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
-private final ReviewService  reviewService;
 
-        @PostMapping
-        public ResponseEntity<ReviewDto> createReview(@PathVariable String restaurantId,
-                                                      @Valid @RequestBody ReviewCreateUpdateRequestDto reviewDto,
-                                                      @AuthenticationPrincipal
-                                                      Jwt jwt) {
-            User user = jwtToUser(jwt);
-            ReviewDto createdReviewDto = reviewService.createReview(user, restaurantId, reviewDto);
+    private final ReviewService reviewService;
 
-            return ResponseEntity.ok(createdReviewDto);
-        }
+    @PostMapping
+    public ResponseEntity<ReviewDto> createReview(@PathVariable String restaurantId,
+                                                  @Valid @RequestBody ReviewCreateUpdateRequestDto reviewDto,
+                                                  @AuthenticationPrincipal
+                                                  Jwt jwt) {
+        User user = jwtToUser(jwt);
+        ReviewDto createdReviewDto = reviewService.createReview(user, restaurantId, reviewDto);
+
+        return ResponseEntity.ok(createdReviewDto);
+    }
+
+    @GetMapping
+    public Page<ReviewDto> listReviews(@PathVariable String restaurantId,
+                                       @PageableDefault(size = 20,
+                                               page = 0,
+                                               sort = "datePosted",
+                                               direction = DESC) Pageable pageable) {
+        return reviewService.lastReviews(restaurantId, pageable);
+    }
 
     private User jwtToUser(Jwt jwt) {
         return User

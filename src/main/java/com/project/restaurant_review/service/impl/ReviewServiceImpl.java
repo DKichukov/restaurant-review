@@ -1,5 +1,6 @@
 package com.project.restaurant_review.service.impl;
 
+import com.project.restaurant_review.dto.RestaurantDto;
 import com.project.restaurant_review.dto.ReviewCreateUpdateRequestDto;
 import com.project.restaurant_review.dto.ReviewDto;
 import com.project.restaurant_review.entity.Photo;
@@ -8,13 +9,20 @@ import com.project.restaurant_review.entity.Review;
 import com.project.restaurant_review.entity.User;
 import com.project.restaurant_review.exception.RestaurantNotFoundException;
 import com.project.restaurant_review.exception.ReviewNotAllowedException;
+import com.project.restaurant_review.mapper.RestaurantMapper;
 import com.project.restaurant_review.mapper.ReviewMapper;
 import com.project.restaurant_review.repository.RestaurantRepository;
 import com.project.restaurant_review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +35,8 @@ public class ReviewServiceImpl implements ReviewService {
     private final RestaurantRepository restaurantRepository;
 
     private final ReviewMapper reviewMapper;
+
+    private final RestaurantMapper restaurantMapper;
 
     @Override
     public ReviewDto createReview(User author,
@@ -73,6 +83,41 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new RuntimeException("Error retrieving created review"));
 
         return reviewMapper.toReviewDto(review);
+    }
+
+    @Override
+    public Page<ReviewDto> lastReviews(String restaurantId,
+                                       Pageable pageable) {
+
+        Restaurant restaurant = getRestaurantOrThrow(restaurantId);
+        RestaurantDto restaurantDto = restaurantMapper.toRestaurantDto(restaurant);
+        List<ReviewDto> reviews = restaurantDto.getReviews();
+
+        Sort sort = pageable.getSort();
+        if (sort.isSorted()) {
+            Sort.Order order = sort.iterator().next();
+            String property = order.getProperty();
+            var isAccending = order.getDirection().isAscending();
+
+            var comparator = switch (property) {
+                case "datePosted" -> Comparator.comparing(ReviewDto::getDatePosted);
+                case "rating" -> Comparator.comparing(ReviewDto::getRating);
+                default -> Comparator.comparing(ReviewDto::getDatePosted);
+            };
+
+            reviews.sort(isAccending ? comparator : comparator.reversed());
+        } else {
+            reviews.sort(Comparator.comparing(ReviewDto::getDatePosted).reversed());
+        }
+        var start = (int) pageable.getOffset();
+
+        if (start >= reviews.size()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, reviews.size());
+        }
+
+        var end = Math.min(start + pageable.getPageSize(), reviews.size());
+        return new PageImpl<>(reviews.subList(start, end), pageable, reviews.size());
+
     }
 
     private Restaurant getRestaurantOrThrow(String restaurantId) {

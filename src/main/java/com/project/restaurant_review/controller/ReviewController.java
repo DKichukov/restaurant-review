@@ -48,6 +48,14 @@ public class ReviewController {
         return reviewService.lastReviews(restaurantId, pageable);
     }
 
+    @GetMapping(path = "/{reviewId}")
+    public ResponseEntity<ReviewDto> getReview(@PathVariable String restaurantId,
+                                               @PathVariable String reviewId) {
+        return reviewService.getReview(restaurantId, reviewId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
     private User jwtToUser(Jwt jwt) {
         return User
                 .builder()

@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -117,6 +118,18 @@ public class ReviewServiceImpl implements ReviewService {
 
         var end = Math.min(start + pageable.getPageSize(), reviews.size());
         return new PageImpl<>(reviews.subList(start, end), pageable, reviews.size());
+
+    }
+
+    @Override
+    public Optional<ReviewDto> getReview(String restaurantId,
+                                         String reviewId) {
+        Restaurant restaurant = getRestaurantOrThrow(restaurantId);
+
+        return restaurant.getReviews().stream()
+                .filter(r -> reviewId.equals(r.getId()))
+                .findFirst()
+                .map(reviewMapper::toReviewDto);
 
     }
 
